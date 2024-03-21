@@ -88,6 +88,21 @@ mutation (
   }
 }
 `;
+export const CREATE_ISSUE_QUERY = `
+mutation CreateIssue($title: String!, $body: String!, $repo_id: ID!) {
+  createIssue(input: {repositoryId: $repo_id, title: $title, body: $body}) {
+    issue {
+      number
+      body
+    }
+  }
+}`;
+export const FIND_REPOSITORY_QUERY = `
+query FindRepo($organization: String!, $repo: String!) {
+  repository(owner: $organization, name: $repo) {
+    id
+  }
+}`;
 
 /**
  * Instance that manages the GitHub's project api
@@ -96,14 +111,6 @@ mutation (
  */
 export class ProjectKit implements IProjectApi {
   private projectNode: NodeData | null = null;
-
-  /** Requires an instance with a PAT with the 'write:org' permission enabled */
-  constructor(
-    private readonly gql: typeof graphql,
-    private readonly repoData: Repository,
-    private readonly projectNumber: number,
-    private readonly logger: ILogger,
-  ) {}
 
   async changeIssueStateInProject(
     issueCardId: string,
@@ -148,6 +155,16 @@ export class ProjectKit implements IProjectApi {
       throw e;
     }
   }
+
+  /** Requires an instance with a PAT with the 'write:org' permission enabled */
+  constructor(
+      private readonly gql: typeof graphql,
+      private readonly repoData: Repository,
+      private readonly projectNumber: number,
+      private readonly logger: ILogger,
+      private readonly gqlDestination: typeof graphql | undefined,
+      private readonly destination_org: string, private readonly destination_reponame: string
+  ) {}
 
   async fetchProjectData(): Promise<NodeData> {
     if (this.projectNode) {
@@ -254,5 +271,28 @@ export class ProjectKit implements IProjectApi {
     this.logger.info(`Syncing issue #${issue.number} for ${project.title}`);
 
     return await this.assignIssueToProject(issue, project.id);
+  }
+
+
+  async createIssue(issue: Issue) {
+    if (this.gqlDestination != undefined) {
+      let gql: typeof graphql = this.gqlDestination;
+      this.logger.info(`Creating issue #${issue.number} in org=${this.destination_org}`);
+
+      type returnType = { repository: { id: string } };
+      let repo: returnType = await gql<returnType>(FIND_REPOSITORY_QUERY, {
+        organization: this.destination_org, repo: this.destination_reponame
+      });
+
+      let repo_id = repo?.repository.id;
+
+      let create_issue_response = await this.gqlDestination!(CREATE_ISSUE_QUERY, {
+        title: issue.title,
+        body: issue.body,
+        repo_id: repo_id,
+      });
+      return create_issue_response;
+    }
+
   }
 }

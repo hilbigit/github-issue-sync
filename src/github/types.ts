@@ -4,6 +4,9 @@ export type Issue = {
   number: number;
   node_id?: string;
   labels?: (string | { name?: string })[];
+  title?: string | null;
+  body?: string | null;
+
 };
 
 /** Key value pair with the name/id of a field and the name/id of its value */
@@ -41,6 +44,8 @@ export interface IProjectApi {
     project: NodeData,
     fields: FieldValues,
   ): Promise<void>;
+
+  createIssue(issue: Issue): Promise<any>;
 }
 
 /** Class managing the instance of issues */

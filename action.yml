@@ -1,6 +1,6 @@
 name: "Issue Sync"
 description: "Synchronizes issues to a project board"
-author: paritytech
+author: paritytech ( hilbigit for
 branding:
   icon: check-square
   color: green
@@ -27,6 +27,18 @@ inputs:
   PROJECT_TOKEN:
     required: true
     type: string
+  DESTINATION_ORG:
+    required: false
+    type: string
+    description: Name of the organization the issue shall be copied to
+  DESTINATION_REPO:
+    required: false
+    type: string
+    description: Name of the repository the issue shall be copied to
+  DESTINATION_TOKEN:
+    description: Token with access right to the target organization. Only required if sync to another org is needed / TARGET_ORG is filled
+    required: false
+    type: string
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/paritytech/github-issue-sync/action:0.3.2'
+  image: './Dockerfile'

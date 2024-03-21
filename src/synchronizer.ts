@@ -238,12 +238,17 @@ export class Synchronizer {
       );
       await Promise.all(assignCustomFieldPromise);
     }
+    const issueCreateInDestinationPromises = issues.map((issue) =>
+        this.projectKit.createIssue(issue),
+    );
+    await Promise.all(issueCreateInDestinationPromises);
   }
 
   private async updateOneIssue(
     issue: Issue,
     customField?: FieldValues,
   ): Promise<void> | never {
+    await this.projectKit.createIssue(issue);
     const projectNode = await this.projectKit.fetchProjectData();
     const customFieldNodeData = await this.getCustomFieldNodeData(
       projectNode,
@@ -257,5 +262,6 @@ export class Synchronizer {
         customFieldNodeData,
       );
     }
+
   }
 }

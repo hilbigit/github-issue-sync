@@ -1,6 +1,6 @@
-import { GitHub } from "@actions/github/lib/utils";
+import {GitHub} from "@actions/github/lib/utils";
 
-import { IIssues, Issue, Repository } from "./types";
+import {IIssues, Issue, Repository} from "./types";
 
 export class IssueApi implements IIssues {
   /** Requires permissions to the repository with access to the repo */
@@ -30,4 +30,6 @@ export class IssueApi implements IIssues {
     });
     return allIssues.data;
   }
+
 }
+

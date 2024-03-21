@@ -32,6 +32,9 @@ const getRequiredLabels = (): string[] => getMultilineInput("labels");
 const generateSynchronizer = (): Synchronizer => {
   const repoToken = getInput("GITHUB_TOKEN", { required: true });
   const orgToken = getInput("PROJECT_TOKEN", { required: true });
+  const destinationToken = getInput("DESTINATION_TOKEN", { required: false });
+  const destinationOrg = getInput("DESTINATION_ORG", { required: false });
+  const destinationRepo = getInput("DESTINATION_REPO", { required: false });
 
   const projectNumber = parseInt(getInput("project", { required: true }));
 
@@ -42,12 +45,21 @@ const generateSynchronizer = (): Synchronizer => {
   const projectGraphQl = getOctokit(orgToken).graphql.defaults({
     headers: { authorization: `token ${orgToken}` },
   });
+  let destinationGraphQl;
+    if (destinationToken && destinationOrg && destinationRepo) {
+      destinationGraphQl = getOctokit(destinationToken).graphql.defaults({
+      headers: { authorization: `token ${destinationToken}` },
+    });
+
+  }
   const logger = new CoreLogger();
   const projectKit = new ProjectKit(
     projectGraphQl,
     repo,
     projectNumber,
     logger,
+      destinationGraphQl,
+      destinationOrg, destinationRepo
   );
 
   return new Synchronizer(issueKit, projectKit, logger);
