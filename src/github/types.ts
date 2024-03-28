@@ -60,6 +60,8 @@ export interface IIssues {
    * @param includeClosed exclude issues which are closed from the data agregation.
    */
   getAllIssues(excludeClosed: boolean, labels?: string[]): Promise<Issue[]>;
+
+  createIssue(issue: Issue): Promise<any>;
 }
 
 export interface ILogger {

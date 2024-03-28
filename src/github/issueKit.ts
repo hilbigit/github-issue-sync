@@ -31,5 +31,16 @@ export class IssueApi implements IIssues {
     return allIssues.data;
   }
 
+  async createIssue(issue: Issue, ) {
+
+      let create_issue_response = await this.octokit.rest.issues.create({
+        ...this.repoData,
+        title: issue.title!,
+        labels: issue.labels,
+        body: issue.body!,
+
+      });
+      return create_issue_response.data;
+    }
 }
 

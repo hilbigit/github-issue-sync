@@ -1,79 +1,41 @@
-import {
-  debug,
-  error,
-  getInput,
-  getMultilineInput,
-  info,
-  setFailed,
-} from "@actions/core";
-import { context, getOctokit } from "@actions/github";
+import {debug, error, getInput, getMultilineInput, info, setFailed,} from "@actions/core";
+import {context, getOctokit} from "@actions/github";
 
-import { CoreLogger } from "./github/CoreLogger";
-import { IssueApi } from "./github/issueKit";
-import { ProjectKit } from "./github/projectKit";
-import { GitHubContext, Synchronizer } from "./synchronizer";
+import {CoreLogger} from "./github/CoreLogger";
+import {IssueApi} from "./github/issueKit";
+import {GitHubContext, Synchronizer} from "./synchronizer";
 
-const getProjectFieldValues = ():
-  | { field: string; value: string }
-  | undefined => {
-  const field = getInput("project_field");
-  const value = getInput("project_value");
-
-  if (field && value) {
-    return { field, value };
-  } else {
-    debug("'project_field' and 'project_value' are empty.");
-  }
-};
 
 const getRequiredLabels = (): string[] => getMultilineInput("labels");
 
 //* * Generates the class that will handle the project logic */
 const generateSynchronizer = (): Synchronizer => {
   const repoToken = getInput("GITHUB_TOKEN", { required: true });
-  const orgToken = getInput("PROJECT_TOKEN", { required: true });
   const destinationToken = getInput("DESTINATION_TOKEN", { required: false });
-  const destinationOrg = getInput("DESTINATION_ORG", { required: false });
-  const destinationRepo = getInput("DESTINATION_REPO", { required: false });
+  const destinationOrg = getInput("DESTINATION_ORG", { required: true });
+  const destinationRepo = getInput("DESTINATION_REPO", { required: false});
 
-  const projectNumber = parseInt(getInput("project", { required: true }));
 
   const { repo } = context;
 
-  const kit = getOctokit(repoToken);
-  const issueKit = new IssueApi(kit, repo);
-  const projectGraphQl = getOctokit(orgToken).graphql.defaults({
-    headers: { authorization: `token ${orgToken}` },
+  const sourceKit = new IssueApi(getOctokit(repoToken), repo);
+  const destinationApi = new IssueApi(getOctokit(destinationToken?destinationToken: repoToken), {
+    repo: destinationRepo ? destinationRepo: repo.repo,
+    owner: destinationOrg
   });
-  let destinationGraphQl;
-    if (destinationToken && destinationOrg && destinationRepo) {
-      destinationGraphQl = getOctokit(destinationToken).graphql.defaults({
-      headers: { authorization: `token ${destinationToken}` },
-    });
-
-  }
   const logger = new CoreLogger();
-  const projectKit = new ProjectKit(
-    projectGraphQl,
-    repo,
-    projectNumber,
-    logger,
-      destinationGraphQl,
-      destinationOrg, destinationRepo
-  );
 
-  return new Synchronizer(issueKit, projectKit, logger);
+  return new Synchronizer(sourceKit, destinationApi, logger);
 };
 
 const synchronizer = generateSynchronizer();
 const labels = getRequiredLabels();
 
-const projectFields = getProjectFieldValues();
 const { payload } = context;
 const parsedContext: GitHubContext = {
   eventName: context.eventName,
   payload,
-  config: { projectField: projectFields, labels },
+  config: { labels },
 };
 
 const errorHandler = (e: Error) => {

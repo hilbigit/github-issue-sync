@@ -1,22 +1,10 @@
 name: "Issue Sync"
-description: "Synchronizes issues to a project board"
-author: paritytech ( hilbigit for
+description: "Synchronizes issues to a project board or to another organization"
+author: paritytech / hilbigit for syncing issues to another organization and for forgejo adaption
 branding:
   icon: check-square
   color: green
 inputs:
-  project:
-    required: true
-    description: The number of the project which the issues will be synced to
-    type: number
-  project_field:
-    required: false
-    description: The name of the project field that will be set to project_value
-    type: string
-  project_value:
-    required: false
-    description: The value which will be set in the project_field
-    type: string
   labels:
     required: false
     description: array of labels required to execute the action. See Readme for input format.
@@ -24,19 +12,16 @@ inputs:
   GITHUB_TOKEN:
     required: true
     type: string
-  PROJECT_TOKEN:
-    required: true
-    type: string
   DESTINATION_ORG:
-    required: false
+    required: true
     type: string
     description: Name of the organization the issue shall be copied to
   DESTINATION_REPO:
     required: false
     type: string
-    description: Name of the repository the issue shall be copied to
+    description: Name of the repository the issue shall be copied to (defaults to source repo name)
   DESTINATION_TOKEN:
-    description: Token with access right to the target organization. Only required if sync to another org is needed / TARGET_ORG is filled
+    description: Token with access right to the target organization. Only required if sync to another org is needed / TARGET_ORG is filled (defaults to GITHUB_TOKEN)
     required: false
     type: string
 runs:
