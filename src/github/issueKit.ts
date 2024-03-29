@@ -1,13 +1,16 @@
 import {GitHub} from "@actions/github/lib/utils";
 
 import {IIssues, Issue, Repository} from "./types";
+import {CoreLogger} from "src/github/CoreLogger";
 
 export class IssueApi implements IIssues {
   /** Requires permissions to the repository with access to the repo */
   constructor(
     private readonly octokit: InstanceType<typeof GitHub>,
     private readonly repoData: Repository,
-  ) {}
+    private readonly logger = new CoreLogger()
+
+) {}
 
   async getIssueState(issueId: number): Promise<"open" | "closed"> {
     const { owner, repo } = this.repoData;
@@ -32,6 +35,7 @@ export class IssueApi implements IIssues {
   }
 
   async createIssue(issue: Issue, ) {
+      this.logger.info(`Copying #${issue.number} to target repo ${this.repoData.owner}/${this.repoData.repo}`);
 
       let create_issue_response = await this.octokit.rest.issues.create({
         ...this.repoData,
