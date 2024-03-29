@@ -37,6 +37,7 @@ export class Synchronizer {
     private readonly sourceIssueKit: IIssues,
     private readonly targetIssueKit: IIssues,
     private readonly logger: ILogger,
+    private readonly sync_labels = true,
   ) {}
 
   async synchronizeIssue(context: GitHubContext): Promise<void> | never {
@@ -63,6 +64,9 @@ export class Synchronizer {
       this.logger.debug(`Received event: ${context.eventName}`);
       if (this.shouldAssignIssue(context.payload, context.config?.labels)) {
         this.logger.info(`Copying #${issue.number} to target organization`);
+        if (!this.sync_labels) {
+          issue.labels = undefined
+        }
         return this.targetIssueKit.createIssue(issue)
       } else {
         return this.logger.info(

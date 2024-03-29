@@ -14,6 +14,7 @@ const generateSynchronizer = (): Synchronizer => {
   const destinationToken = getInput("DESTINATION_TOKEN", { required: false });
   const destinationOrg = getInput("DESTINATION_ORG", { required: true });
   const destinationRepo = getInput("DESTINATION_REPO", { required: false});
+  const sync_labels_disabled = getInput("SYNC_LABELS_DISABLED", { required: false});
 
 
   const { repo } = context;
@@ -25,7 +26,7 @@ const generateSynchronizer = (): Synchronizer => {
   });
   const logger = new CoreLogger();
 
-  return new Synchronizer(sourceKit, destinationApi, logger);
+  return new Synchronizer(sourceKit, destinationApi, logger, !(sync_labels_disabled && sync_labels_disabled=="true"));
 };
 
 const synchronizer = generateSynchronizer();
