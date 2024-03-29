@@ -35,12 +35,26 @@ export class IssueApi implements IIssues {
   }
 
   async createIssue(issue: Issue, ) {
-      this.logger.info(`Copying #${issue.number} to target repo ${this.repoData.owner}/${this.repoData.repo}, labels=${JSON.stringify(issue.labels)}`);
+
+      let labels: string[] = []
+      if (issue.labels) {
+        for (const lab of issue.labels) {
+          if (typeof lab ==="string") {
+            labels.push(lab)
+          } else {
+            if (lab.name) {
+              labels.push(lab.name)
+            }
+          }
+        }
+
+      }
+      this.logger.info(`Copying #${issue.number} to target repo ${this.repoData.owner}/${this.repoData.repo}, labels=${JSON.stringify(labels)}`);
 
       let create_issue_response = await this.octokit.rest.issues.create({
         ...this.repoData,
         title: issue.title!,
-        labels: issue.labels,
+        labels: labels,
         body: issue.body!,
 
       });
