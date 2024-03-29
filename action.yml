@@ -1,6 +1,6 @@
 name: "Issue Sync"
-description: "Synchronizes issues to a project board or to another organization"
-author: paritytech / hilbigit for syncing issues to another organization and for forgejo adaption
+description: "Synchronizes issues between different projects or organizations"
+author: hilbigit for syncing issues to another organization and for forgejo adaption (original codebase for syncing to project by paritytech)
 branding:
   icon: check-square
   color: green
