@@ -35,7 +35,7 @@ export class IssueApi implements IIssues {
   }
 
   async createIssue(issue: Issue, ) {
-      this.logger.info(`Copying #${issue.number} to target repo ${this.repoData.owner}/${this.repoData.repo}`);
+      this.logger.info(`Copying #${issue.number} to target repo ${this.repoData.owner}/${this.repoData.repo}, labels=${JSON.stringify(issue.labels)}`);
 
       let create_issue_response = await this.octokit.rest.issues.create({
         ...this.repoData,
