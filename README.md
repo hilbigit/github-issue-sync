@@ -7,9 +7,13 @@ This project enables (deviating from the original forked action) syncing GitHub 
 
 ## Why is this necessary?
 
-Meanwhile there is an official Github - Workflow solving the problem which was originally solved by paitytech (see fork info - thanks to this contribution!). 
+Meanwhile there is an official Github - Workflow solving the problem which was originally solved by paitytech (see fork info - thanks to this contribution!) (auto-adding issues to projects)
 
-Nevertheless - 
+Nevertheless - syncing issues between organizations is not yet possible with the official solution. This might be necessary e.g. if a private repo is forked into another private repo 
+and within the fork there is no access to the original issues - by labelling them with a marker label (e.g. "sync") it can be selected which issues from the original repo shall be visible within the
+fork. This is usefull if the fork - organization is e.g. the organization of a customer using the product produced by a supplier - and from the supplier perspective not every information must be visible to
+the customer.. on the other hand some tickets containing e.g. requirements or bug - descriptions shall be shared.
+
 # How it works
 The following events trigger the synchronization of an issue:
 - [`issues`](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#issues)
