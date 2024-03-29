@@ -24,6 +24,10 @@ inputs:
     description: Token with access right to the target organization. Only required if sync to another org is needed / TARGET_ORG is filled (defaults to GITHUB_TOKEN)
     required: false
     type: string
+  SYNC_LABELS_DISABLED:
+    description: Set to true if labels shall not be copied into target repo (this must be false in case of using forgejo because of api differences, forgejo expects IDs instead of label names!)
+    required: false
+    type: string
 runs:
   using: 'docker'
   image: './Dockerfile'
